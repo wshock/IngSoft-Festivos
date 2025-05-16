@@ -1,6 +1,7 @@
-package calendariosLaborales.api.aplicacion.servicios.impl;
+package calendariosLaborales.api.aplicacion.servicios;
 
 import calendariosLaborales.api.core.servicios.IFestivoServicio;
+import calendariosLaborales.api.dominio.dtos.FestivoDTO;
 import calendariosLaborales.api.dominio.entidades.Festivo;
 import calendariosLaborales.api.infraestructura.repositorios.IFestivoRepositorio;
 import calendariosLaborales.api.infraestructura.repositorios.IPaisRepositorio;
@@ -9,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Date;
 
 @Service
 public class FestivoServicioImpl implements IFestivoServicio {
@@ -24,17 +27,21 @@ public class FestivoServicioImpl implements IFestivoServicio {
 
     @Override
     public Boolean consultarSiEsFestivo(int idpais, LocalDate fecha) {
-       // List<Festivo> fijos = festivoRepositorio.findFestivosFijosByDiaAndMesAndPaisId(fecha.getDayOfMonth(), fecha.getMonthValue(), idpais);
-       // if (!fijos.isEmpty()) return true;
-       // LocalDate pascua = calcularPascua(fecha.getYear());
-       // List<Festivo> variables = festivoRepositorio.findFestivosVariablesByPaisId(idpais);
-       // return variables.stream().anyMatch(f -> pascua.plusDays(f.getDiasPascua()).equals(fecha));
-       System.out.println("Hola desde el servicio");
-       if (idpais == 1) {
-        return true;
-       } else {
-        return false;
-       }
+        // List<Festivo> fijos =
+        // festivoRepositorio.findFestivosFijosByDiaAndMesAndPaisId(fecha.getDayOfMonth(),
+        // fecha.getMonthValue(), idpais);
+        // if (!fijos.isEmpty()) return true;
+        // LocalDate pascua = calcularPascua(fecha.getYear());
+        // List<Festivo> variables =
+        // festivoRepositorio.findFestivosVariablesByPaisId(idpais);
+        // return variables.stream().anyMatch(f ->
+        // pascua.plusDays(f.getDiasPascua()).equals(fecha));
+        System.out.println("Hola desde el servicio");
+        if (idpais == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private LocalDate calcularPascua(int year) {
@@ -56,10 +63,26 @@ public class FestivoServicioImpl implements IFestivoServicio {
     }
 
     @Override
-    public List<Festivo> obtenerFestivosDelAnio(String pais, int anio) {
-        return festivoRepositorio.findAll().stream()
+    public List<FestivoDTO> obtenerFestivosDelAnio(String pais, int anio) {
+        var festivos = festivoRepositorio.findAll().stream()
                 .filter(f -> f.getPais().getNombre().equals(pais))
                 .collect(Collectors.toList());
+        List<FestivoDTO> festivoDTOs = new ArrayList<>();
+        for (Festivo festivo : festivos) {
+            FestivoDTO festivoDTO = new FestivoDTO();
+            festivoDTO.setNombre(festivo.getNombre());
+            switch (festivoDTOs.getTipo().getId()) {
+                case 2:
+                    Date fecha = ServicioFechas
+                            .siguienteLunes(new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia()));
+                    festivoDTO.setFecha(fecha);
+                    break;
+
+            }
+            festivoDTOs.add(festivoDTO);
+
+        }
+        return festivoDTOs;
     }
 
     @Override
