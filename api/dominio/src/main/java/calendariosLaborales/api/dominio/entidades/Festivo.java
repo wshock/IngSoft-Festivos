@@ -33,7 +33,8 @@ public class Festivo {
     @JoinColumn(name = "idtipo", referencedColumnName = "id")
     private Tipo tipo;
 
-    public Festivo() {}
+    public Festivo() {
+    }
 
     public Festivo(int id, Pais pais, String nombre, Integer dia, Integer mes, Integer diasPascua, Tipo tipo) {
         this.id = id;
@@ -44,6 +45,8 @@ public class Festivo {
         this.diasPascua = diasPascua;
         this.tipo = tipo;
     }
+
+    // Getters y Setters
 
     public int getId() {
         return id;

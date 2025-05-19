@@ -11,32 +11,24 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Date;
 
 @Service
 public class FestivoServicioImpl implements IFestivoServicio {
 
     @Autowired
     private IFestivoRepositorio festivoRepositorio;
+
     @Autowired
     private IPaisRepositorio paisRepositorio;
+
     @Autowired
     private ITipoRepositorio tipoRepositorio;
 
     @Override
     public Boolean consultarSiEsFestivo(int idpais, LocalDate fecha) {
-        // List<Festivo> fijos =
-        // festivoRepositorio.findFestivosFijosByDiaAndMesAndPaisId(fecha.getDayOfMonth(),
-        // fecha.getMonthValue(), idpais);
-        // if (!fijos.isEmpty()) return true;
-        // LocalDate pascua = calcularPascua(fecha.getYear());
-        // List<Festivo> variables =
-        // festivoRepositorio.findFestivosVariablesByPaisId(idpais);
-        // return variables.stream().anyMatch(f ->
-        // pascua.plusDays(f.getDiasPascua()).equals(fecha));
-        System.out.println("Hola desde el servicio");
         if (idpais == 1) {
             return true;
         } else {
@@ -65,22 +57,45 @@ public class FestivoServicioImpl implements IFestivoServicio {
     @Override
     public List<FestivoDTO> obtenerFestivosDelAnio(String pais, int anio) {
         var festivos = festivoRepositorio.findAll().stream()
-                .filter(f -> f.getPais().getNombre().equals(pais))
+                .filter(f -> f.getPais().getNombre().equalsIgnoreCase(pais))
                 .collect(Collectors.toList());
+
         List<FestivoDTO> festivoDTOs = new ArrayList<>();
+        LocalDate pascua = calcularPascua(anio);
+
         for (Festivo festivo : festivos) {
             FestivoDTO festivoDTO = new FestivoDTO();
             festivoDTO.setNombre(festivo.getNombre());
-            switch (festivoDTOs.getTipo().getId()) {
-                case 2:
-                    Date fecha = ServicioFechas
-                            .siguienteLunes(new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia()));
-                    festivoDTO.setFecha(fecha);
+
+            switch (festivo.getTipo().getId()) {
+                case 1: // Fijo
+                    festivoDTO.setFecha(new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia()));
                     break;
 
-            }
-            festivoDTOs.add(festivoDTO);
+                case 2: // Ley de puente festivo: se traslada al siguiente lunes
+                    Date fechaOriginal = new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia());
+                    Date fechaPuente = ServicioFechas.siguienteLunes(fechaOriginal);
+                    festivoDTO.setFecha(fechaPuente);
+                    break;
 
+                case 3: // Basado en domingo de pascua + días
+                    LocalDate fechaPascuaCalculada = pascua.plusDays(festivo.getDiasPascua());
+                    festivoDTO.setFecha(java.sql.Date.valueOf(fechaPascuaCalculada));
+                    break;
+
+                case 4: // Basado en domingo de pascua + días, con ley de puente
+                    LocalDate fechaPascuaPuente = pascua.plusDays(festivo.getDiasPascua());
+                    Date fechaBase = java.sql.Date.valueOf(fechaPascuaPuente);
+                    Date fechaPuenteFinal = ServicioFechas.siguienteLunes(fechaBase);
+                    festivoDTO.setFecha(fechaPuenteFinal);
+                    break;
+
+                default:
+                    festivoDTO.setFecha(null);
+                    break;
+            }
+
+            festivoDTOs.add(festivoDTO);
         }
         return festivoDTOs;
     }
@@ -115,4 +130,3 @@ public class FestivoServicioImpl implements IFestivoServicio {
         festivoRepositorio.deleteById(id);
         return true;
     }
-}

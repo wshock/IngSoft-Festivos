@@ -7,13 +7,15 @@ public class FestivoDTO {
     private String nombre;
     private Date fecha;
 
+    public FestivoDTO() {
+    }
+
     public FestivoDTO(String nombre, Date fecha) {
         this.nombre = nombre;
         this.fecha = fecha;
     }
 
-    public FestivoDTO() {
-    }
+    // Getters y Setters
 
     public String getNombre() {
         return nombre;
@@ -30,5 +32,4 @@ public class FestivoDTO {
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
-
 }
