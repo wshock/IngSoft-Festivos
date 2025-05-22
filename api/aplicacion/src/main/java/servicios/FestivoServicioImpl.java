@@ -55,9 +55,10 @@ public class FestivoServicioImpl implements IFestivoServicio {
     }
 
     @Override
-    public List<FestivoDTO> obtenerFestivosDelAnio(String pais, int anio) {
+    public List<FestivoDTO> obtenerFestivosDelAnio(int idpais, int anio) {
+        var paisName = paisRepositorio.findById(idpais);
         var festivos = festivoRepositorio.findAll().stream()
-                .filter(f -> f.getPais().getNombre().equalsIgnoreCase(pais))
+                .filter(f -> f.getPais().getNombre().equalsIgnoreCase(paisName.get().getNombre()))
                 .collect(Collectors.toList());
 
         List<FestivoDTO> festivoDTOs = new ArrayList<>();
@@ -130,3 +131,4 @@ public class FestivoServicioImpl implements IFestivoServicio {
         festivoRepositorio.deleteById(id);
         return true;
     }
+}
