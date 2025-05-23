@@ -28,8 +28,8 @@ public class FestivoControlador {
         return servicio.consultarSiEsFestivo(idpais, anio, mes, dia) ? "Es festivo" : "No es festivo";
     }
 
-    @RequestMapping(value = "/festivos/{idpais}/{id}", method=RequestMethod.GET)
-    public List<FestivoDTO> requestMethodName(@PathVariable String idpais, @PathVariable int id) {
+    @RequestMapping(value = "/listar/{idpais}/{id}", method=RequestMethod.GET)
+    public List<FestivoDTO> listarFestivos(@PathVariable String idpais, @PathVariable int id) {
         return servicio.obtenerFestivosDelAnio(Integer.parseInt(idpais), id);
     }
     
