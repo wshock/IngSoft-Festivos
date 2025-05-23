@@ -8,7 +8,7 @@ import calendariosLaborales.api.dominio.entidades.*;
 
 public interface IFestivoServicio {
 
-    Boolean consultarSiEsFestivo(int idpais, LocalDate fecha);
+    Boolean consultarSiEsFestivo(int idpais, int year, int month, int day);
 
     public List<FestivoDTO> obtenerFestivosDelAnio(int idpais, int anio);
 

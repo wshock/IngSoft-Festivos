@@ -23,10 +23,9 @@ public class FestivoControlador {
         this.servicio = servicio;
     }
 
-    @RequestMapping(value = "/verificar/{id}", method=RequestMethod.POST)
-    public String consultEsFestivo(@RequestBody LocalDate date, @PathVariable int id) {
-        System.out.println("hola desde el controller");
-        return servicio.consultarSiEsFestivo(id, date) ? "Es festivo" : "No es festivo";
+    @RequestMapping(value = "/verificar/{idpais}/{anio}/{mes}/{dia}", method=RequestMethod.POST)
+    public String consultEsFestivo(@PathVariable int idpais, @PathVariable int anio, @PathVariable int mes, @PathVariable int dia) {
+        return servicio.consultarSiEsFestivo(idpais, anio, mes, dia) ? "Es festivo" : "No es festivo";
     }
 
     @RequestMapping(value = "/festivos/{idpais}/{id}", method=RequestMethod.GET)

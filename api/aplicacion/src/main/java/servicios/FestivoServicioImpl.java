@@ -7,9 +7,13 @@ import calendariosLaborales.api.infraestructura.repositorios.IFestivoRepositorio
 import calendariosLaborales.api.infraestructura.repositorios.IPaisRepositorio;
 import calendariosLaborales.api.infraestructura.repositorios.ITipoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,13 +32,12 @@ public class FestivoServicioImpl implements IFestivoServicio {
     private ITipoRepositorio tipoRepositorio;
 
     @Override
-    public Boolean consultarSiEsFestivo(int idpais, LocalDate fecha) {
-        if (idpais == 1) {
-            return true;
-        } else {
-            return false;
-        }
+    public Boolean consultarSiEsFestivo(int idpais, int year, int month, int day) {
+        List<FestivoDTO> festivos = obtenerFestivosDelAnio(idpais, year);
+        LocalDate fechaConsulta = LocalDate.of(year, month, day);
+        return festivos.stream().anyMatch(f -> f.getFecha().equals(fechaConsulta));
     }
+    
 
     private LocalDate calcularPascua(int year) {
         int a = year % 19;
@@ -70,25 +73,25 @@ public class FestivoServicioImpl implements IFestivoServicio {
 
             switch (festivo.getTipo().getId()) {
                 case 1: // Fijo
-                    festivoDTO.setFecha(new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia()));
+                    festivoDTO.setFecha(new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                     break;
 
                 case 2: // Ley de puente festivo: se traslada al siguiente lunes
                     Date fechaOriginal = new Date(anio - 1900, festivo.getMes() - 1, festivo.getDia());
                     Date fechaPuente = ServicioFechas.siguienteLunes(fechaOriginal);
-                    festivoDTO.setFecha(fechaPuente);
+                    festivoDTO.setFecha(fechaPuente.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                     break;
 
                 case 3: // Basado en domingo de pascua + días
                     LocalDate fechaPascuaCalculada = pascua.plusDays(festivo.getDiasPascua());
-                    festivoDTO.setFecha(java.sql.Date.valueOf(fechaPascuaCalculada));
+                    festivoDTO.setFecha(java.sql.Date.valueOf(fechaPascuaCalculada).toLocalDate());
                     break;
 
                 case 4: // Basado en domingo de pascua + días, con ley de puente
                     LocalDate fechaPascuaPuente = pascua.plusDays(festivo.getDiasPascua());
                     Date fechaBase = java.sql.Date.valueOf(fechaPascuaPuente);
                     Date fechaPuenteFinal = ServicioFechas.siguienteLunes(fechaBase);
-                    festivoDTO.setFecha(fechaPuenteFinal);
+                    festivoDTO.setFecha(fechaPuenteFinal.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                     break;
 
                 default:
