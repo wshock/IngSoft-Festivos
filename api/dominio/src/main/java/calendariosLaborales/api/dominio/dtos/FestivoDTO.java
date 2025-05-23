@@ -1,25 +1,36 @@
 package calendariosLaborales.api.dominio.dtos;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 public class FestivoDTO {
-    private int id;
-    private String pais;
+
     private String nombre;
-    private Integer dia;
-    private Integer mes;
-    private Integer diasPascua;
-    private String tipo;
+    private LocalDate fecha;
 
-    public FestivoDTO() {}
-
-    public FestivoDTO(int id, String pais, String nombre, Integer dia, Integer mes, Integer diasPascua, String tipo) {
-        this.id = id;
-        this.pais = pais;
-        this.nombre = nombre;
-        this.dia = dia;
-        this.mes = mes;
-        this.diasPascua = diasPascua;
-        this.tipo = tipo;
+    public FestivoDTO() {
     }
 
-    // Getters and setters omitted for brevity
+    public FestivoDTO(String nombre, LocalDate fecha) {
+        this.nombre = nombre;
+        this.fecha = fecha;
+    }
+
+    // Getters y Setters
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
 }

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import calendariosLaborales.api.core.servicios.IFestivoServicio;
+import calendariosLaborales.api.dominio.dtos.FestivoDTO;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -21,15 +23,14 @@ public class FestivoControlador {
         this.servicio = servicio;
     }
 
-    @RequestMapping(value = "/verificar/{id}", method=RequestMethod.POST)
-    public String consultEsFestivo(@RequestBody LocalDate date, @PathVariable int id) {
-        System.out.println("hola desde el controller");
-        return servicio.consultarSiEsFestivo(id, date) ? "Es festivo" : "No es festivo";
+    @RequestMapping(value = "/verificar/{idpais}/{anio}/{mes}/{dia}", method=RequestMethod.POST)
+    public String consultEsFestivo(@PathVariable int idpais, @PathVariable int anio, @PathVariable int mes, @PathVariable int dia) {
+        return servicio.consultarSiEsFestivo(idpais, anio, mes, dia) ? "Es festivo" : "No es festivo";
     }
 
-    @RequestMapping(value = "/jejeje", method=RequestMethod.GET)
-    public String requestMethodNam() {
-        return "hola que ahce";
+    @RequestMapping(value = "/festivos/{idpais}/{id}", method=RequestMethod.GET)
+    public List<FestivoDTO> requestMethodName(@PathVariable String idpais, @PathVariable int id) {
+        return servicio.obtenerFestivosDelAnio(Integer.parseInt(idpais), id);
     }
     
     
